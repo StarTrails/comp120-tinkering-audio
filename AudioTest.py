@@ -17,8 +17,8 @@ while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
-    if event.type == pygame.KEYDOWN and pygame.K_RETURN:
-        pygame.mixer.music.set_volume(1.0)
+        if event.type == pygame.KEYDOWN and pygame.K_RETURN:
+            pygame.mixer.music.set_volume(1.0)
 
     pygame.display.update()
 
