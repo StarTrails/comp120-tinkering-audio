@@ -5,7 +5,7 @@ import random
 pygame.init()
 pygame.mixer.init()
 
-pygame.display.set_mode((800,600))
+pygame.display.set_mode((800,600)) #displays blank window
 
 #Selection of different soungs
 MusicTrack = 'Good_Times_Roll.mp3'
@@ -32,15 +32,11 @@ def play_sound():
         play_music(0,0)
         print '3'
 
-'''
-pygame.mixer.music.load(MusicTrack)
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.5)
-'''
 play_sound()
 
 done = False
 
+#close down pygame
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
