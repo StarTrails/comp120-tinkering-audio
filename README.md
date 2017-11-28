@@ -6,3 +6,4 @@ For our assignment we need to create a program that will generate a music track 
 The choice of genre is irrelevent as long as the program functions correctly.
 ### Stretch Goals
 Creating a menu that lets the user change the music track that is playing.
+https://github.com/StarTrails/comp120-tinkering-audio
