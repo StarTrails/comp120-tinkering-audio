@@ -8,8 +8,8 @@ import math
 
 pygame.init()
 pygame.mixer.init()
-
-pygame.display.set_mode((800,600)) # Displays blank window
+# Displays blank window
+pygame.display.set_mode((800,600))
 
 # Sets values for each component for the tone
 SAMPLE_WIDTH = 4
@@ -69,6 +69,7 @@ def tone_creation(tone, tone2, tone3, delay, sample_length):
             echo2 = tone3[i] * 0.6
             values.append(echo2 + tone2[i] + tone[i])
     return values
+
 
 # Creates the 3 separate sound files
 tone_one = generate_sine_wave(frequency, SAMPLE_RATE, sample_length, volume)
