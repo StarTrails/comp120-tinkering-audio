@@ -1,51 +1,87 @@
 import pygame
 import random
+import numpy
+import wave
+import struct
+import math
 
 
 pygame.init()
 pygame.mixer.init()
 
-pygame.display.set_mode((800,600)) #displays blank window
+pygame.display.set_mode((800,600)) # Displays blank window
 
-#Selection of different soungs
-MusicTrack = 'Good_Times_Roll.mp3'
-MusicTrack2 = "Dont_Be_Shy.mp3"
-MusicTrack3 = "Ripped.mp3"
+# Sets values for each component for the tone
+SAMPLE_WIDTH = 4
+SAMPLE_RATE = 44100.0
+BIT_DEPTH = 5.0
+CHANNELS = 2
 
-#loads the songs
-load_music = pygame.mixer.music.load
-play_music = pygame.mixer.music.play
+# Sets volume and length of tones being generated
+frequency = 4000.0
+sample_length = 121000
+volume = 800.0
+delay = 40000
 
-#chooses a song randomly
-def play_sound():
-    pick_a_song = random.randrange(0, 3)
-    if pick_a_song == 0:
-        load_music(MusicTrack)
-        play_music(0,0)
-        print '1'
-    if pick_a_song == 1:
-        load_music(MusicTrack2)
-        play_music(0,0)
-        print '2'
-    if pick_a_song == 2:
-        load_music(MusicTrack3)
-        play_music(0,0)
-        print '3'
 
-play_sound()
+# Combines the tones
+def combine_sounds(tone_one, tone_two, sample_length):
+    values = []
+    for i in range(0, sample_length):
+        values.append(tone_one[i] + tone_two[i])
+    return values
 
-done = False
 
-#close down pygame
-while not done:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-        if event.type == pygame.KEYDOWN and pygame.K_RETURN:
-            pygame.mixer.music.set_volume(1.0)
+# Creates the tones using sound waves
+def generate_sine_wave(frequency, sample_rate, sample_length, volume):
+    values = []
+    for i in range (0, sample_length):
+        value = math.sin(2 * math.pi * frequency * (i / sample_rate) * (volume * BIT_DEPTH))
+        for j in xrange(0, CHANNELS):
+            values.append(value)
 
-    if event.type == pygame.KEYDOWN and pygame.KEYUP: #when the right shift key is pressed, picks a random song
-        if event.key == pygame.K_RSHIFT:
-            play_sound()
-    pygame.display.update()
-pygame.quit()
+    return values
+
+
+# Function to save the tones generate
+def save_file(filename, wav_data, sample_rate):
+    packed_values = []
+    for i in range(0, len(wav_data)):
+        packed_value = struct.pack('h', wav_data[i])
+        packed_values.append(packed_value)
+
+    noise_out = wave.open(filename, 'w')
+    noise_out.setparams((CHANNELS, SAMPLE_WIDTH, sample_rate, 0, 'NONE', 'not compressed'))
+    value_str = ''.join((str(n) for n in packed_values))
+    noise_out.writeframes(value_str)
+    noise_out.close()
+
+
+# Adds the delay for the tones
+def tone_creation(tone, tone2, tone3, delay, sample_length):
+    values = []
+    for i in range(0, sample_length):
+        values.append(tone[i])
+        if i > delay:
+            echo = tone2[i]*0.6
+            values.append(echo + tone[i])
+        if i < delay * 2:
+            echo2 = tone3[i] * 0.6
+            values.append(echo2 + tone2[i] + tone[i])
+    return values
+
+# Creates the 3 separate sound files
+tone_one = generate_sine_wave(frequency, SAMPLE_RATE, sample_length, volume)
+tone_two = generate_sine_wave(frequency, SAMPLE_RATE, sample_length, volume)
+tone_three = generate_sine_wave(frequency, SAMPLE_RATE, sample_length, volume)
+
+# Names the saved tone file
+save_file('tone1.wav', tone_one, SAMPLE_RATE)
+save_file('tone2.wav', tone_two, SAMPLE_RATE)
+save_file('tone3.wav', tone_three, SAMPLE_RATE)
+
+# Creates the combined sound files to form something like a song
+create_music = tone_creation(tone_one, tone_two, tone_three, delay, 132000)
+
+# Names the combined sound files
+save_file('combined_tone_creation.wav', create_music, SAMPLE_RATE)
